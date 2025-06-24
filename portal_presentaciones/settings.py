@@ -133,7 +133,7 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
-STATIC_ROOT = '/home/leomarrg/portal_presentaciones/static'   # Producción
+STATIC_ROOT = BASE_DIR / 'staticfiles'   # Producción
 
 # Si en local quieres un STATIC_ROOT distinto, cámbialo aquí:
 # STATIC_ROOT = BASE_DIR / 'staticfiles'
