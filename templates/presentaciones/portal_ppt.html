@@ -224,6 +224,34 @@
             }, index * 100);
         });
     });
+
+    // Agregar este script temporalmente para debug
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('=== DEBUG CSS THUMBNAILS ===');
+    
+    const thumbnails = document.querySelectorAll('.presentation-thumbnail');
+    
+    thumbnails.forEach((thumb, index) => {
+        console.log(`Thumbnail ${index}:`);
+        console.log('- Classes:', thumb.className);
+        console.log('- Has image:', thumb.querySelector('img') !== null);
+        
+        // Verificar estilos computados del ::before
+        const beforeStyle = window.getComputedStyle(thumb, '::before');
+        console.log('- ::before content:', beforeStyle.content);
+        console.log('- ::before display:', beforeStyle.display);
+        
+        // Forzar eliminación con JavaScript si es necesario
+        const style = document.createElement('style');
+        style.textContent = `
+            .presentation-thumbnail:nth-child(${index + 1})::before {
+                content: none !important;
+                display: none !important;
+            }
+        `;
+        document.head.appendChild(style);
+    });
+});
     </script>
 
     <style>
