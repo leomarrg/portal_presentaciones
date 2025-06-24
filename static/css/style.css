@@ -998,9 +998,8 @@ s
 /* Ajustes específicos para móviles (hasta 767px) */
 @media (max-width: 767px) {
     .header-logo {
-        width: 260px;
-        height: 260px;
-        margin-bottom: 20px;
+        width: 260px !important;
+        height: 260px !important;
     }
     
     .header h1 {
