@@ -8,7 +8,9 @@ class Administracion(models.Model):
         ('adsef', 'Administración de Desarrollo Socioeconómico de la Familia (ADSEF)'),
         ('asume', 'Administración para el Sustento de Menores (ASUME)'),
         ('secretariado', 'Secretariado del Departamento de la Familia'),
-        ('ofi de lic.', 'Oficina de Licenciamiento')
+        ('ofi de lic.', 'Oficina de Licenciamiento'),
+        ('procurador', 'Programa Estatal del Producrador de Cuidado a Larga Duración'),
+        ('TRUC+', 'Proyecto TRUC+')
     ]
     
     codigo = models.CharField(max_length=20, choices=TIPOS_CHOICES, unique=True)
