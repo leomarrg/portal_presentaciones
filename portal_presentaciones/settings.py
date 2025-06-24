@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-m&r5ju8f3qggu$23@_li5i_28$+i8)755#!s7mthcn84=fm$)8'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+ALLOWED_HOSTS = ['leomarrg.pythonanywhere.com' #'localhost', '127.0.0.1']
 
 # Application definition
 
@@ -76,6 +76,19 @@ WSGI_APPLICATION = 'portal_presentaciones.wsgi.application'
 
 DATABASES = {
     'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'leomarrg$construyendopuentes',
+        'USER': 'leomarrg',
+        'PASSWORD': 'Italia101pr',
+        'HOST': 'leomarrg.mysql.pythonanywhere-services.com',
+        'PORT': '3306',
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
+    },
+}
+DATABASES = {
+    'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': BASE_DIR / 'db.sqlite3',
     }
@@ -120,14 +133,19 @@ STATIC_URL = '/static/'
 STATICFILES_DIRS = [
     BASE_DIR / 'static',
 ]
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = '/home/leomarrg/portal_presentaciones/static'   # Producción
+
+# Si en local quieres un STATIC_ROOT distinto, cámbialo aquí:
+# STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Archivos multimedia
 MEDIA_URL = '/media/'
-MEDIA_ROOT = BASE_DIR / 'media'
+#para desarrollo local
+#MEDIA_ROOT = BASE_DIR / 'media'
+MEDIA_ROOT = '/home/leomarrg/portal_presentaciones/media' #produccion
 
-FILE_UPLOAD_MAX_MEMORY_SIZE = 524288000  # 500MB
-DATA_UPLOAD_MAX_MEMORY_SIZE = 524288000  # 500MB
+FILE_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024   # 50MB
+DATA_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024   # 50MB
 
 # Configuraciones de seguridad para uploads
 FILE_UPLOAD_PERMISSIONS = 0o644
