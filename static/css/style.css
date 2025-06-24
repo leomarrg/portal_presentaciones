@@ -19,19 +19,6 @@ body {
     font-family: 'Poppins', Tahoma, Geneva, Verdana, sans-serif;
 }
 
-/* Fondo con escudo opcional */
-body::before {
-    content: "";
-    position: absolute;
-    top: 0; 
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: url("../img/Escudo@2x.png") no-repeat right top;
-    background-size: contain;
-    opacity: 0.2;
-    z-index: -1;
-}
 
 /* ========================================
     CONTENEDORES PRINCIPALES
