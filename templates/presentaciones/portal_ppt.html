@@ -266,6 +266,48 @@ document.addEventListener('DOMContentLoaded', function() {
         document.head.appendChild(style);
     });
 });
+
+// Agregar este script temporalmente al HTML para debuggear
+console.log('=== INVESTIGANDO CSS FUENTES ===');
+
+// 1. Verificar todos los archivos CSS cargados
+console.log('--- ARCHIVOS CSS CARGADOS ---');
+const cssLinks = document.querySelectorAll('link[rel="stylesheet"]');
+cssLinks.forEach((link, index) => {
+    console.log(`CSS ${index + 1}:`, link.href);
+});
+
+// 2. Verificar CSS inline en el HEAD
+console.log('--- CSS INLINE EN HEAD ---');
+const styleElements = document.querySelectorAll('style');
+styleElements.forEach((style, index) => {
+    console.log(`Style ${index + 1}:`, style.textContent.substring(0, 200) + '...');
+});
+
+// 3. Verificar las reglas CSS aplicadas al header-logo
+console.log('--- REGLAS APLICADAS A HEADER-LOGO ---');
+const headerLogo = document.querySelector('.header-logo');
+if (headerLogo) {
+    const computedStyle = window.getComputedStyle(headerLogo);
+    console.log('Width actual:', computedStyle.width);
+    console.log('Height actual:', computedStyle.height);
+    console.log('Position actual:', computedStyle.position);
+    
+    // Obtener todas las reglas CSS que afectan a este elemento
+    const sheets = Array.from(document.styleSheets);
+    sheets.forEach((sheet, sheetIndex) => {
+        try {
+            const rules = Array.from(sheet.cssRules || sheet.rules);
+            rules.forEach((rule, ruleIndex) => {
+                if (rule.selectorText && rule.selectorText.includes('.header-logo')) {
+                    console.log(`Regla encontrada en hoja ${sheetIndex}, regla ${ruleIndex}:`, rule.cssText);
+                }
+            });
+        } catch (e) {
+            console.log(`No se puede acceder a la hoja ${sheetIndex}:`, e.message);
+        }
+    });
+}
     </script>
 
     <style>
