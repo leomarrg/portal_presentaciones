@@ -52,14 +52,11 @@
         <div class="presentations-grid">
             {% for presentacion in presentaciones %}
             <div class="presentation-card" data-id="{{ presentacion.id }}">
-                <div class="presentation-thumbnail">
+                <div class="presentation-thumbnail {% if presentacion.imagen_thumbnail %}has-image{% endif %}">
                     {% if presentacion.imagen_thumbnail %}
                         <img src="{{ presentacion.imagen_thumbnail.url }}" 
                              alt="{{ presentacion.titulo }}" 
-                             class="thumbnail-image"
-                             onload="this.style.opacity='1'; this.nextElementSibling?.remove();"
-                             onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
-                        <div class="thumbnail-placeholder" style="display: none;">📊</div>
+                             class="thumbnail-image">
                     {% else %}
                         <div class="thumbnail-placeholder">📊</div>
                     {% endif %}
@@ -181,20 +178,52 @@
             }
         }
 
-        // Animaciones de entrada
         document.addEventListener('DOMContentLoaded', function() {
-            const cards = document.querySelectorAll('.presentation-card');
-            cards.forEach((card, index) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(50px)';
+        // Manejo de imágenes de thumbnail
+        const thumbnailImages = document.querySelectorAll('.thumbnail-image');
+        
+        thumbnailImages.forEach(img => {
+            const container = img.closest('.presentation-thumbnail');
+            
+            img.onload = function() {
+                // Imagen cargada exitosamente
+                container.classList.add('has-image');
+                this.style.opacity = '1';
+            };
+            
+            img.onerror = function() {
+                // Error al cargar imagen - mostrar placeholder
+                container.classList.remove('has-image');
+                this.style.display = 'none';
                 
-                setTimeout(() => {
-                    card.style.transition = 'all 0.6s ease';
-                    card.style.opacity = '1';
-                    card.style.transform = 'translateY(0)';
-                }, index * 100);
-            });
+                // Crear placeholder si no existe
+                if (!container.querySelector('.thumbnail-placeholder')) {
+                    const placeholder = document.createElement('div');
+                    placeholder.className = 'thumbnail-placeholder';
+                    placeholder.textContent = '📊';
+                    container.appendChild(placeholder);
+                }
+            };
+            
+            // Si la imagen ya está en caché, trigger onload manualmente
+            if (img.complete && img.naturalHeight !== 0) {
+                img.onload();
+            }
         });
+
+        // Animaciones de entrada existentes
+        const cards = document.querySelectorAll('.presentation-card');
+        cards.forEach((card, index) => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(50px)';
+            
+            setTimeout(() => {
+                card.style.transition = 'all 0.6s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 100);
+        });
+    });
     </script>
 
     <style>

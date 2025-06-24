@@ -270,7 +270,6 @@ body::before {
 .presentation-thumbnail {
     width: 100%;
     height: 200px;
-    background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
     border-radius: 12px;
     margin-bottom: 20px;
     display: flex;
@@ -278,26 +277,57 @@ body::before {
     justify-content: center;
     position: relative;
     overflow: hidden;
+    /* Removemos el background gradient por defecto */
+    background: #f8f9fa; /* Solo un color de fondo neutro */
 }
 
+/* Estilo para cuando SÍ hay imagen */
 .presentation-thumbnail img {
     width: 100%;
     height: 100%;
-    object-fit: contain; /* Cambiado de 'cover' a 'contain' para ver completo */
+    object-fit: cover; /* Volvemos a 'cover' para mejor visualización */
     border-radius: 12px;
-    background: #f8f9fa; /* Fondo para áreas vacías */
+    display: block; /* Aseguramos que se muestre como bloque */
 }
 
-/* Solo mostrar el emoji cuando NO hay imagen */
-.presentation-thumbnail:not(:has(img))::before {
-    content: '📊';
+/* Estilo para el placeholder solo cuando NO hay imagen */
+.presentation-thumbnail .thumbnail-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     font-size: 4rem;
     opacity: 0.8;
+    background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+    color: white;
+    border-radius: 12px;
+    position: absolute;
+    top: 0;
+    left: 0;
 }
 
-/* Ocultar background cuando hay imagen */
-.presentation-thumbnail:has(img) {
-    background: none;
+/* Cuando hay imagen, ocultamos completamente el placeholder */
+.presentation-thumbnail:has(img) .thumbnail-placeholder {
+    display: none !important;
+}
+
+/* Cuando NO hay imagen, aplicamos el gradient al contenedor */
+.presentation-thumbnail:not(:has(img)) {
+    background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
+}
+
+/* Fallback para navegadores que no soportan :has() */
+.presentation-thumbnail.has-image {
+    background: #f8f9fa;
+}
+
+.presentation-thumbnail.has-image .thumbnail-placeholder {
+    display: none !important;
+}
+
+.presentation-thumbnail:not(.has-image) {
+    background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
 }
 
 /* ========================================
