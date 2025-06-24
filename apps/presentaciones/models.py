@@ -9,7 +9,7 @@ class Administracion(models.Model):
         ('asume', 'Administración para el Sustento de Menores (ASUME)'),
         ('secretariado', 'Secretariado del Departamento de la Familia'),
         ('ofi de lic.', 'Oficina de Licenciamiento'),
-        ('procurador', 'Programa Estatal del Producrador de Cuidado a Larga Duración'),
+        ('procurador', 'Programa Estatal del Procurador de Cuidado a Larga Duración'),
         ('TRUC+', 'Proyecto TRUC+'),
         ('emergency grant', 'Proyecto Emergency Situation Grant')
     ]
