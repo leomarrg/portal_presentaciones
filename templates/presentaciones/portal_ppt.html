@@ -267,46 +267,66 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 
-// Agregar este script temporalmente al HTML para debuggear
-console.log('=== INVESTIGANDO CSS FUENTES ===');
+// Script para debuggear media queries específicamente
+console.log('=== DEBUGGEANDO MEDIA QUERIES ===');
 
-// 1. Verificar todos los archivos CSS cargados
-console.log('--- ARCHIVOS CSS CARGADOS ---');
-const cssLinks = document.querySelectorAll('link[rel="stylesheet"]');
-cssLinks.forEach((link, index) => {
-    console.log(`CSS ${index + 1}:`, link.href);
+// 1. Verificar el ancho actual de la ventana
+console.log('Ancho de ventana:', window.innerWidth + 'px');
+
+// 2. Verificar si las media queries están funcionando
+function testMediaQuery(query, name) {
+    const mq = window.matchMedia(query);
+    console.log(`${name} (${query}):`, mq.matches ? 'SÍ APLICA' : 'No aplica');
+    return mq.matches;
+}
+
+// Probar diferentes media queries
+console.log('--- TESTING MEDIA QUERIES ---');
+testMediaQuery('(max-width: 480px)', 'Móvil pequeño');
+testMediaQuery('(min-width: 481px) and (max-width: 767px)', 'Móvil grande');
+testMediaQuery('(min-width: 768px) and (max-width: 991px)', 'Tablet');
+testMediaQuery('(min-width: 992px)', 'Desktop');
+
+// 3. Verificar todas las reglas CSS (incluyendo media queries)
+console.log('--- TODAS LAS REGLAS CSS ---');
+const sheets = Array.from(document.styleSheets);
+let mediaRulesFound = 0;
+
+sheets.forEach((sheet, sheetIndex) => {
+    try {
+        const rules = Array.from(sheet.cssRules || sheet.rules);
+        rules.forEach((rule, ruleIndex) => {
+            if (rule.type === CSSRule.MEDIA_RULE) {
+                mediaRulesFound++;
+                console.log(`Media Rule ${mediaRulesFound}:`, rule.conditionText);
+                
+                // Verificar si tiene reglas para header-logo
+                const innerRules = Array.from(rule.cssRules);
+                innerRules.forEach(innerRule => {
+                    if (innerRule.selectorText && innerRule.selectorText.includes('.header-logo')) {
+                        console.log(`  ↳ Header-logo rule:`, innerRule.cssText);
+                    }
+                });
+            }
+        });
+    } catch (e) {
+        console.log(`Error accediendo hoja ${sheetIndex}:`, e.message);
+    }
 });
 
-// 2. Verificar CSS inline en el HEAD
-console.log('--- CSS INLINE EN HEAD ---');
-const styleElements = document.querySelectorAll('style');
-styleElements.forEach((style, index) => {
-    console.log(`Style ${index + 1}:`, style.textContent.substring(0, 200) + '...');
-});
+console.log(`Total media rules encontradas: ${mediaRulesFound}`);
 
-// 3. Verificar las reglas CSS aplicadas al header-logo
-console.log('--- REGLAS APLICADAS A HEADER-LOGO ---');
+// 4. Verificar estilos computados en diferentes tamaños
 const headerLogo = document.querySelector('.header-logo');
 if (headerLogo) {
     const computedStyle = window.getComputedStyle(headerLogo);
-    console.log('Width actual:', computedStyle.width);
-    console.log('Height actual:', computedStyle.height);
-    console.log('Position actual:', computedStyle.position);
-    
-    // Obtener todas las reglas CSS que afectan a este elemento
-    const sheets = Array.from(document.styleSheets);
-    sheets.forEach((sheet, sheetIndex) => {
-        try {
-            const rules = Array.from(sheet.cssRules || sheet.rules);
-            rules.forEach((rule, ruleIndex) => {
-                if (rule.selectorText && rule.selectorText.includes('.header-logo')) {
-                    console.log(`Regla encontrada en hoja ${sheetIndex}, regla ${ruleIndex}:`, rule.cssText);
-                }
-            });
-        } catch (e) {
-            console.log(`No se puede acceder a la hoja ${sheetIndex}:`, e.message);
-        }
-    });
+    console.log('--- ESTILOS COMPUTADOS ACTUALES ---');
+    console.log('Width:', computedStyle.width);
+    console.log('Height:', computedStyle.height);
+    console.log('Position:', computedStyle.position);
+    console.log('Left:', computedStyle.left);
+    console.log('Top:', computedStyle.top);
+    console.log('Transform:', computedStyle.transform);
 }
     </script>
 
