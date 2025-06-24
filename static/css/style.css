@@ -18,7 +18,7 @@ body {
     min-height: 100vh;
     font-family: 'Poppins', Tahoma, Geneva, Verdana, sans-serif;
 }
-
+s
 
 /* ========================================
     CONTENEDORES PRINCIPALES
@@ -981,8 +981,8 @@ body {
 /* Ajustes específicos para tablets (768px a 991px) */
 @media (min-width: 768px) and (max-width: 991px) {
     .header-logo {
-        width: 180px;
-        height: 180px;
+        width: 280px;
+        height: 280px;
         margin-bottom: 30px;
     }
     
