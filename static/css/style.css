@@ -18,7 +18,6 @@ body {
     min-height: 100vh;
     font-family: 'Poppins', Tahoma, Geneva, Verdana, sans-serif;
 }
-s
 
 /* ========================================
     CONTENEDORES PRINCIPALES
@@ -264,20 +263,17 @@ s
     justify-content: center;
     position: relative;
     overflow: hidden;
-    /* Removemos el background gradient por defecto */
-    background: #f8f9fa; /* Solo un color de fondo neutro */
+    background: #f8f9fa;
 }
 
-/* Estilo para cuando SÍ hay imagen */
 .presentation-thumbnail img {
     width: 100%;
     height: 100%;
-    object-fit: cover; /* Volvemos a 'cover' para mejor visualización */
+    object-fit: cover;
     border-radius: 12px;
-    display: block; /* Aseguramos que se muestre como bloque */
+    display: block;
 }
 
-/* Estilo para el placeholder solo cuando NO hay imagen */
 .presentation-thumbnail .thumbnail-placeholder {
     width: 100%;
     height: 100%;
@@ -294,17 +290,14 @@ s
     left: 0;
 }
 
-/* Cuando hay imagen, ocultamos completamente el placeholder */
 .presentation-thumbnail:has(img) .thumbnail-placeholder {
     display: none !important;
 }
 
-/* Cuando NO hay imagen, aplicamos el gradient al contenedor */
 .presentation-thumbnail:not(:has(img)) {
     background: linear-gradient(45deg, #f093fb 0%, #f5576c 100%);
 }
 
-/* Fallback para navegadores que no soportan :has() */
 .presentation-thumbnail.has-image {
     background: #f8f9fa;
 }
@@ -321,39 +314,33 @@ s
     FUERZA LA ELIMINACIÓN COMPLETA DEL ::before
 ======================================== */
 
-/* Eliminar TODOS los ::before de thumbnails */
 .presentation-thumbnail::before {
     content: none !important;
     display: none !important;
 }
 
-/* También eliminar ::after por si acaso */
 .presentation-thumbnail::after {
     content: none !important;
     display: none !important;
 }
 
-/* Para elementos con imagen, fuerza la eliminación */
 .presentation-thumbnail.has-image::before,
 .presentation-thumbnail.has-image::after {
     content: none !important;
     display: none !important;
 }
 
-/* Regla más específica para casos persistentes */
 .presentation-card .presentation-thumbnail::before,
 .presentation-card .presentation-thumbnail::after {
     content: none !important;
     display: none !important;
 }
 
-/* Si tienes alguna regla con :not(), también elimínala */
 .presentation-thumbnail:not(.has-image)::before {
     content: none !important;
     display: none !important;
 }
 
-/* Regla de emergencia para cualquier pseudo-elemento */
 *[class*="thumbnail"]::before,
 *[class*="thumbnail"]::after {
     content: none !important;
@@ -909,7 +896,7 @@ s
 }
 
 /* ========================================
-    RESPONSIVE DESIGN - SOLO HEADER LOGO
+    RESPONSIVE DESIGN CORREGIDO
 ======================================== */
 
 /* Large Desktop (1920px and up) */
@@ -948,8 +935,8 @@ s
     }
 }
 
-/* Responsive styles para tablets/iPads (incluyendo iPad Pro) y móvil - Logo y texto centrados verticalmente */
-@media (max-width: 1024px) {
+/* Tablets (768px to 991px) */
+@media (min-width: 768px) and (max-width: 991px) {
     .container,
     .admin-container {
         padding: 10px;
@@ -960,7 +947,7 @@ s
     }
     
     .header {
-        padding-left: 0; /* Removemos el padding lateral */
+        padding-left: 0;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -969,20 +956,12 @@ s
     }
     
     .header-logo {
-        position: relative; /* Cambiamos de absolute a relative */
-        left: auto;
-        top: auto;
-        transform: none;
-        width: 260px; /* Tamaño para tablets */
-        height: 260px;
-        margin-bottom: 25px; /* Espacio entre logo y texto */
-    }
-    
-/* Ajustes específicos para tablets (768px a 991px) */
-@media (min-width: 768px) and (max-width: 991px) {
-    .header-logo {
-        width: 280px;
-        height: 280px;
+        position: relative !important;
+        left: auto !important;
+        top: auto !important;
+        transform: none !important;
+        width: 220px !important;
+        height: 220px !important;
         margin-bottom: 30px;
     }
     
@@ -993,23 +972,6 @@ s
     .header p {
         font-size: 1.2rem;
     }
-}
-
-/* Ajustes específicos para móviles (hasta 767px) */
-@media (max-width: 767px) {
-    .header-logo {
-        width: 260px !important;
-        height: 260px !important;
-    }
-    
-    .header h1 {
-        font-size: 2rem;
-    }
-    
-    .header p {
-        font-size: 1.1rem;
-    }
-}
     
     .survey-header {
         padding: 30px 20px;
@@ -1076,22 +1038,96 @@ s
     }
 }
 
-@media (max-width: 480px) {
+/* Large Mobile (481px to 767px) */
+@media (min-width: 481px) and (max-width: 767px) {
+    .container,
+    .admin-container {
+        padding: 15px;
+    }
+    
     .header {
-        padding-top: 15px;
+        padding-top: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
     }
     
     .header-logo {
-        width: 260px;
-        height: 260px;
+        position: relative !important;
+        left: auto !important;
+        top: auto !important;
+        transform: none !important;
+        width: 200px !important;
+        height: 200px !important;
+        margin-bottom: 25px;
     }
     
     .header h1 {
-        font-size: 1.6rem;
+        font-size: 2rem;
+    }
+    
+    .header p {
+        font-size: 1.1rem;
+    }
+    
+    .presentations-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .stats {
+        flex-direction: column;
+        gap: 15px;
+    }
+}
+
+/* Small Mobile (max 480px) */
+@media (max-width: 480px) {
+    .container,
+    .admin-container {
+        padding: 10px;
+    }
+    
+    .header {
+        padding-top: 15px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .header-logo {
+        position: relative !important;
+        left: auto !important;
+        top: auto !important;
+        transform: none !important;
+        width: 180px !important;
+        height: 180px !important;
+        margin-bottom: 20px;
+    }
+    
+    .header h1 {
+        font-size: 1.8rem;
     }
     
     .header p {
         font-size: 1rem;
+    }
+    
+    .presentations-grid {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+    
+    .stats {
+        flex-direction: column;
+        gap: 15px;
+    }
+    
+    .modal-content {
+        padding: 15px;
+        margin: 10px;
     }
 }
 
