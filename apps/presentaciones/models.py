@@ -11,7 +11,8 @@ class Administracion(models.Model):
         ('ofi de lic.', 'Oficina de Licenciamiento'),
         ('procurador', 'Programa Estatal del Procurador de Cuidado a Larga Duración'),
         ('TRUC+', 'Proyecto TRUC+'),
-        ('emergency grant', 'Proyecto Emergency Situation Grant')
+        ('emergency grant', 'Proyecto Emergency Situation Grant'), 
+        ('veterando', 'Procurador del Veterano')
     ]
     
     codigo = models.CharField(max_length=20, choices=TIPOS_CHOICES, unique=True)
