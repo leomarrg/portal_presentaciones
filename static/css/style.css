@@ -331,6 +331,49 @@ body::before {
 }
 
 /* ========================================
+    FUERZA LA ELIMINACIÓN COMPLETA DEL ::before
+======================================== */
+
+/* Eliminar TODOS los ::before de thumbnails */
+.presentation-thumbnail::before {
+    content: none !important;
+    display: none !important;
+}
+
+/* También eliminar ::after por si acaso */
+.presentation-thumbnail::after {
+    content: none !important;
+    display: none !important;
+}
+
+/* Para elementos con imagen, fuerza la eliminación */
+.presentation-thumbnail.has-image::before,
+.presentation-thumbnail.has-image::after {
+    content: none !important;
+    display: none !important;
+}
+
+/* Regla más específica para casos persistentes */
+.presentation-card .presentation-thumbnail::before,
+.presentation-card .presentation-thumbnail::after {
+    content: none !important;
+    display: none !important;
+}
+
+/* Si tienes alguna regla con :not(), también elimínala */
+.presentation-thumbnail:not(.has-image)::before {
+    content: none !important;
+    display: none !important;
+}
+
+/* Regla de emergencia para cualquier pseudo-elemento */
+*[class*="thumbnail"]::before,
+*[class*="thumbnail"]::after {
+    content: none !important;
+    display: none !important;
+}
+
+/* ========================================
     INFORMACIÓN Y TÍTULOS
 ======================================== */
 
