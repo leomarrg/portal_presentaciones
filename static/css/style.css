@@ -930,8 +930,8 @@ body {
 @media (min-width: 992px) and (max-width: 1199px) {
     .header-logo {
         left: 2%;
-        width: 295px;
-        height: 295px;
+        width: 250px;
+        height: 250px;
     }
 }
 
