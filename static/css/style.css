@@ -912,8 +912,8 @@ body {
 @media (min-width: 1600px) and (max-width: 1919px) {
     .header-logo {
         left: -15%;
-        width: 325px;
-        height: 325px;
+        width: 475px;
+        height: 475px;
     }
 }
 
@@ -921,8 +921,8 @@ body {
 @media (min-width: 1200px) and (max-width: 1599px) {
     .header-logo {
         left: -5%;
-        width: 300px;
-        height: 300px;
+        width: 450px;
+        height: 450px;
     }
 }
 
@@ -930,8 +930,8 @@ body {
 @media (min-width: 992px) and (max-width: 1199px) {
     .header-logo {
         left: 2%;
-        width: 250px;
-        height: 250px;
+        width: 315px;
+        height: 315px;
     }
 }
 
@@ -960,8 +960,8 @@ body {
         left: auto !important;
         top: auto !important;
         transform: none !important;
-        width: 220px !important;
-        height: 220px !important;
+        width: 290px !important;
+        height: 290px !important;
         margin-bottom: 30px;
     }
     
@@ -1058,9 +1058,8 @@ body {
         left: auto !important;
         top: auto !important;
         transform: none !important;
-        width: 200px !important;
-        height: 200px !important;
-        margin-bottom: 25px;
+        width: 290px !important;
+        height: 290px !important;
     }
     
     .header h1 {
@@ -1102,9 +1101,8 @@ body {
         left: auto !important;
         top: auto !important;
         transform: none !important;
-        width: 180px !important;
-        height: 180px !important;
-        margin-bottom: 20px;
+        width: 240px !important;
+        height: 240px !important;
     }
     
     .header h1 {
@@ -1209,4 +1207,29 @@ body {
 
 .survey-content {
     padding: 40px;
+}
+
+
+.main-logo {
+    text-align: center;
+}
+
+.main-logo img {
+    max-height: 120px; /* Ajusta según el tamaño que necesites */
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Responsive para el logo principal */
+@media (max-width: 768px) {
+    .main-logo img {
+        max-height: 80px;
+    }
+}
+
+@media (max-width: 480px) {
+    .main-logo img {
+        max-height: 60px;
+    }
 }
