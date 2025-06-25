@@ -912,8 +912,8 @@ body {
 @media (min-width: 1600px) and (max-width: 1919px) {
     .header-logo {
         left: -15%;
-        width: 450px;
-        height: 450px;
+        width: 400px;
+        height: 40px;
     }
 }
 
@@ -921,8 +921,8 @@ body {
 @media (min-width: 1200px) and (max-width: 1599px) {
     .header-logo {
         left: -5%;
-        width: 425px;
-        height: 425px;
+        width: 375px;
+        height: 375px;
     }
 }
 
@@ -930,8 +930,8 @@ body {
 @media (min-width: 992px) and (max-width: 1199px) {
     .header-logo {
         left: 2%;
-        width: 315px;
-        height: 315px;
+        width: 295px;
+        height: 295px;
     }
 }
 
