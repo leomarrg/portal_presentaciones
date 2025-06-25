@@ -962,7 +962,7 @@ body {
         transform: none !important;
         width: 240px !important;
         height: 240px !important;
-        margin-bottom: -30px;
+        margin-bottom: -55px;
     }
     
     .header h1 {
@@ -1060,7 +1060,7 @@ body {
         transform: none !important;
         width: 290px !important;
         height: 290px !important;
-        margin-bottom: -45px;
+        margin-bottom: -65px;
     }
     
     .header h1 {
@@ -1225,7 +1225,7 @@ body {
 /* Responsive para el logo principal */
 @media (max-width: 768px) {
     .main-logo img {
-        max-height: 80px;
+        max-height: 60px;
     }
 }
 
