@@ -962,7 +962,7 @@ body {
         transform: none !important;
         width: 290px !important;
         height: 290px !important;
-        margin-bottom: 30px;
+        margin-bottom: -30px;
     }
     
     .header h1 {
@@ -1060,6 +1060,7 @@ body {
         transform: none !important;
         width: 290px !important;
         height: 290px !important;
+        margin-bottom: -45px;
     }
     
     .header h1 {
