@@ -1216,7 +1216,7 @@ body {
 }
 
 .main-logo img {
-    max-height: 120px; /* Ajusta según el tamaño que necesites */
+    max-height: 100px; /* Ajusta según el tamaño que necesites */
     width: auto;
     height: auto;
     object-fit: contain;
