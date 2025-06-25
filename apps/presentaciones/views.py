@@ -120,19 +120,20 @@ def api_presentacion_detalle(request, presentacion_id):
 
 @staff_member_required
 def exportar_informe_pdf(request):
-    """Generar y DESCARGAR PDF directamente usando ReportLab"""
+    """Generar y DESCARGAR PDF directamente usando ReportLab con porcentajes por evaluación"""
     try:
         from reportlab.lib.pagesizes import letter, A4
         from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer, PageBreak
         from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
         from reportlab.lib import colors
         from reportlab.lib.units import inch
+        from collections import Counter
         
         # Obtener TODAS las respuestas
         respuestas = RespuestaEncuesta.objects.all().order_by('-creado_en')
         total_respuestas = respuestas.count()
         
-        # Estadísticas
+        # Estadísticas básicas
         stats = {
             'total_respuestas': total_respuestas,
             'respuestas_completas': sum(1 for r in respuestas if r.esta_completa()),
@@ -140,12 +141,56 @@ def exportar_informe_pdf(request):
             'promedio_general': sum(r.calificacion_promedio() for r in respuestas if r.calificacion_promedio() > 0) / total_respuestas if total_respuestas > 0 else 0,
         }
         
+        # NUEVO: Calcular porcentajes por cada sección
+        def calcular_porcentajes_seccion(campo_evaluacion):
+            """Calcula los porcentajes para una sección específica"""
+            evaluaciones = [getattr(r, campo_evaluacion) for r in respuestas if getattr(r, campo_evaluacion)]
+            contador = Counter(evaluaciones)
+            total_evaluaciones = len(evaluaciones)
+            
+            porcentajes = {}
+            opciones = ['muy_buena', 'buena', 'regular', 'mala', 'incompleta']
+            nombres_opciones = {
+                'muy_buena': 'Muy Buena',
+                'buena': 'Buena', 
+                'regular': 'Regular',
+                'mala': 'Mala',
+                'incompleta': 'Incompleta'
+            }
+            
+            for opcion in opciones:
+                cantidad = contador.get(opcion, 0)
+                porcentaje = (cantidad / total_evaluaciones * 100) if total_evaluaciones > 0 else 0
+                porcentajes[nombres_opciones[opcion]] = {
+                    'cantidad': cantidad,
+                    'porcentaje': porcentaje
+                }
+            
+            return porcentajes, total_evaluaciones
+        
+        # Calcular porcentajes para todas las secciones
+        secciones_stats = {}
+        secciones = {
+            'ADFAN': 'evaluacion_adfan',
+            'ACUDEN': 'evaluacion_acuden', 
+            'ADSEF': 'evaluacion_adsef',
+            'ASUME': 'evaluacion_asume',
+            'Secretariado': 'evaluacion_secretariado'
+        }
+        
+        for nombre_seccion, campo in secciones.items():
+            porcentajes, total_eval = calcular_porcentajes_seccion(campo)
+            secciones_stats[nombre_seccion] = {
+                'porcentajes': porcentajes,
+                'total_evaluaciones': total_eval
+            }
+        
         # Crear PDF en memoria con márgenes mínimos
         buffer = BytesIO()
         doc = SimpleDocTemplate(
             buffer, 
             pagesize=A4, 
-            rightMargin=20,  # Márgenes mínimos para maximizar espacio
+            rightMargin=20,
             leftMargin=20, 
             topMargin=72, 
             bottomMargin=40
@@ -159,7 +204,7 @@ def exportar_informe_pdf(request):
             fontSize=18,
             spaceAfter=30,
             textColor=colors.HexColor('#1c2854'),
-            alignment=1  # Centrado
+            alignment=1
         )
         
         subtitle_style = ParagraphStyle(
@@ -180,7 +225,7 @@ def exportar_informe_pdf(request):
         story.append(Paragraph(f"Generado el {timezone.now().strftime('%d de %B, %Y a las %H:%M')}", subtitle_style))
         story.append(Spacer(1, 20))
         
-        # Estadísticas
+        # Estadísticas generales
         stats_data = [
             ['Concepto', 'Cantidad'],
             ['Total de Respuestas', str(stats['total_respuestas'])],
@@ -204,18 +249,60 @@ def exportar_informe_pdf(request):
         story.append(stats_table)
         story.append(Spacer(1, 30))
         
-        # Título de la tabla de respuestas
+        # NUEVA SECCIÓN: Análisis de porcentajes por sección
+        story.append(Paragraph("ANÁLISIS DETALLADO POR SECCIÓN", styles['Heading2']))
+        story.append(Spacer(1, 15))
+        
+        for nombre_seccion, datos in secciones_stats.items():
+            # Título de la sección
+            story.append(Paragraph(f"Sección: {nombre_seccion}", styles['Heading3']))
+            story.append(Paragraph(f"Total de evaluaciones: {datos['total_evaluaciones']}", styles['Normal']))
+            story.append(Spacer(1, 10))
+            
+            # Crear tabla de porcentajes para esta sección
+            porcentajes_data = [['Calificación', 'Cantidad', 'Porcentaje']]
+            
+            for calificacion, info in datos['porcentajes'].items():
+                if info['cantidad'] > 0:  # Solo mostrar opciones que tienen respuestas
+                    porcentajes_data.append([
+                        calificacion,
+                        str(info['cantidad']),
+                        f"{info['porcentaje']:.1f}%"
+                    ])
+            
+            # Si no hay datos, mostrar mensaje
+            if len(porcentajes_data) == 1:
+                porcentajes_data.append(['Sin evaluaciones', '0', '0%'])
+            
+            porcentajes_table = Table(porcentajes_data, colWidths=[2*inch, 1*inch, 1*inch])
+            porcentajes_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#34495e')),
+                ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+                ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 10),
+                ('FONTSIZE', (0, 1), (-1, -1), 9),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+                ('BACKGROUND', (0, 1), (-1, -1), colors.white),
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f8f9fa')]),
+                ('GRID', (0, 0), (-1, -1), 0.75, colors.grey),
+                ('TOPPADDING', (0, 1), (-1, -1), 4),
+                ('BOTTOMPADDING', (0, 1), (-1, -1), 4),
+            ]))
+            
+            story.append(porcentajes_table)
+            story.append(Spacer(1, 15))
+        
+        # Nueva página para el listado completo
+        story.append(PageBreak())
         story.append(Paragraph("LISTADO COMPLETO DE RESPUESTAS", styles['Heading2']))
         story.append(Spacer(1, 12))
         
         # Función para crear tabla con todas las respuestas
         def crear_tabla_respuestas(respuestas_list):
-            # Headers de la tabla (sin ID y sin Promedio)
             table_data = [['Fecha', 'ADFAN', 'ACUDEN', 'ADSEF', 'ASUME', 'Secretariado', 'Comentarios']]
             
-            # Agregar TODAS las respuestas
             for respuesta in respuestas_list:
-                # Función auxiliar para obtener display completo
                 def get_full_display(evaluation):
                     if not evaluation:
                         return '-'
@@ -228,24 +315,20 @@ def exportar_informe_pdf(request):
                     }
                     return mapping.get(evaluation, evaluation.title())
                 
-                # Procesar comentarios con saltos de línea automáticos
                 comentarios_texto = ''
                 if respuesta.comentarios and respuesta.comentarios.strip():
-                    # Usar Paragraph para permitir saltos de línea automáticos
                     comentarios_raw = respuesta.comentarios.strip()
-                    # Limpiar el texto y prepararlo para Paragraph
                     comentarios_raw = comentarios_raw.replace('\n', '<br/>')
                     comentarios_raw = comentarios_raw.replace('\r', '')
-                    # Crear un objeto Paragraph para que ReportLab maneje el word wrap
                     comment_style = ParagraphStyle(
                         'CommentStyle',
-                        fontSize=8,         # Aumentar tamaño de fuente para comentarios
-                        leading=10,         # Espaciado entre líneas
+                        fontSize=8,
+                        leading=10,
                         leftIndent=3,
                         rightIndent=3,
                         spaceAfter=0,
                         spaceBefore=0,
-                        wordWrap='LTR'      # Permitir word wrap
+                        wordWrap='LTR'
                     )
                     comentarios_texto = Paragraph(comentarios_raw, comment_style)
                 else:
@@ -266,77 +349,60 @@ def exportar_informe_pdf(request):
         
         # Crear tabla con todas las respuestas
         table_data = crear_tabla_respuestas(respuestas)
-        
-        # Configurar anchos de columna optimizados para que quepa en A4
         col_widths = [0.8*inch, 0.9*inch, 0.9*inch, 0.9*inch, 0.9*inch, 1.0*inch, 2.2*inch]
-        
-        # Dividir en múltiples tablas si hay demasiadas filas para una página
-        rows_per_table = 18  # Aumentar filas ya que hay menos columnas
+        rows_per_table = 18
         
         for i in range(0, len(table_data), rows_per_table):
-            # Si no es la primera tabla, agregar nueva página
             if i > 0:
                 story.append(PageBreak())
                 story.append(Paragraph(f"LISTADO DE RESPUESTAS (Continuación - Página {(i//rows_per_table) + 1})", styles['Heading2']))
                 story.append(Spacer(1, 12))
             
-            # Obtener el chunk de datos para esta tabla
-            chunk_data = table_data[0:1] + table_data[i+1:i+rows_per_table+1]  # Incluir header + datos
+            chunk_data = table_data[0:1] + table_data[i+1:i+rows_per_table+1]
             
-            # Crear tabla
             responses_table = Table(chunk_data, colWidths=col_widths)
             responses_table.setStyle(TableStyle([
-                # Header
                 ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#34495e')),
                 ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
                 ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-                ('FONTSIZE', (0, 0), (-1, 0), 9),  # Aumentar fuente del header
+                ('FONTSIZE', (0, 0), (-1, 0), 9),
                 ('BOTTOMPADDING', (0, 0), (-1, 0), 10),
                 ('TOPPADDING', (0, 0), (-1, 0), 6),
                 ('LEFTPADDING', (0, 0), (-1, 0), 6),   
                 ('RIGHTPADDING', (0, 0), (-1, 0), 6),
-                # Datos - Con más espacio al eliminar columnas
-                ('ALIGN', (0, 0), (5, -1), 'CENTER'),  # Centrar las primeras 6 columnas
-                ('ALIGN', (6, 1), (6, -1), 'LEFT'),    # Alinear comentarios a la izquierda
-                ('FONTSIZE', (0, 1), (5, -1), 8),      # Aumentar fuente para datos
+                ('ALIGN', (0, 0), (5, -1), 'CENTER'),
+                ('ALIGN', (6, 1), (6, -1), 'LEFT'),
+                ('FONTSIZE', (0, 1), (5, -1), 8),
                 ('BACKGROUND', (0, 1), (-1, -1), colors.white),
                 ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f8f9fa')]),
                 ('GRID', (0, 0), (-1, -1), 0.75, colors.grey),
-                ('VALIGN', (0, 0), (-1, -1), 'TOP'),    # Alinear contenido arriba
-                # Espaciado optimizado con menos columnas
+                ('VALIGN', (0, 0), (-1, -1), 'TOP'),
                 ('LEFTPADDING', (0, 1), (5, -1), 6),    
                 ('RIGHTPADDING', (0, 1), (5, -1), 6),   
-                ('LEFTPADDING', (6, 1), (6, -1), 8),    # Padding para comentarios
+                ('LEFTPADDING', (6, 1), (6, -1), 8),
                 ('RIGHTPADDING', (6, 1), (6, -1), 8),
                 ('TOPPADDING', (0, 1), (-1, -1), 6),    
                 ('BOTTOMPADDING', (0, 1), (-1, -1), 6), 
-                # Altura mínima de fila
-                ('ROWSIZE', (0, 1), (-1, -1), 28),      # Altura mínima optimizada
+                ('ROWSIZE', (0, 1), (-1, -1), 28),
             ]))
             
             story.append(responses_table)
             story.append(Spacer(1, 15))
         
-        # Nota sobre comentarios
-        story.append(Spacer(1, 15))
-        nota_comentarios = """
-        <b>Nota:</b> Los comentarios se muestran completos en la tabla principal 
-        con saltos de línea automáticos para mantener la legibilidad. La tabla se ajusta automáticamente 
-        a la altura necesaria para mostrar todo el contenido.
-        """
-        story.append(Paragraph(nota_comentarios, styles['Normal']))
-        
-        # Eliminar la sección separada de comentarios destacados ya que están en la tabla
-        # comentarios = respuestas.filter(comentarios__isnull=False).exclude(comentarios='')[:10]
-        # if comentarios:
-        #     ... (código comentado)
-        
-        # Resumen final
+        # Resumen final actualizado
         story.append(Spacer(1, 30))
         story.append(Paragraph("RESUMEN EJECUTIVO", styles['Heading2']))
         
-        # Calcular estadísticas de comentarios
         total_con_comentarios = respuestas.filter(comentarios__isnull=False).exclude(comentarios='').count()
+        
+        # Encontrar la sección con mejor promedio
+        mejor_seccion = ""
+        mejor_porcentaje_muy_buena = 0
+        for nombre, datos in secciones_stats.items():
+            porcentaje_muy_buena = datos['porcentajes'].get('Muy Buena', {}).get('porcentaje', 0)
+            if porcentaje_muy_buena > mejor_porcentaje_muy_buena:
+                mejor_porcentaje_muy_buena = porcentaje_muy_buena
+                mejor_seccion = nombre
         
         resumen_text = f"""
         Este informe contiene un análisis completo de {total_respuestas} respuestas de evaluación 
@@ -345,6 +411,10 @@ def exportar_informe_pdf(request):
         {total_con_comentarios} incluyen comentarios adicionales 
         ({(total_con_comentarios/total_respuestas*100):.1f}% con comentarios). 
         El promedio general de calificación es de {stats['promedio_general']:.1f}.
+        
+        <b>Análisis por secciones:</b> La sección mejor evaluada es {mejor_seccion} con 
+        {mejor_porcentaje_muy_buena:.1f}% de calificaciones "Muy Buena". El análisis detallado 
+        de porcentajes por cada sección se encuentra en las páginas anteriores.
         
         <b>Todos los comentarios están incluidos en la tabla principal del reporte</b> para facilitar 
         la lectura y análisis conjunto de evaluaciones y observaciones.
@@ -364,7 +434,6 @@ def exportar_informe_pdf(request):
         return response
         
     except ImportError:
-        # ReportLab no está instalado
         return HttpResponse("""
             <h2>Error: ReportLab no está instalado</h2>
             <p>Para generar PDFs, instala ReportLab:</p>
@@ -372,7 +441,6 @@ def exportar_informe_pdf(request):
             <p><a href="/dashboard/">Volver al Dashboard</a></p>
         """)
     except Exception as e:
-        # Error inesperado
         return HttpResponse(f"""
             <h2>Error generando PDF</h2>
             <p>Error: {str(e)}</p>
